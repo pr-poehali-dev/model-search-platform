@@ -21,7 +21,7 @@ interface FilterSidebarProps {
 const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [paymentType, setPaymentType] = useState<string>("all");
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [selectedLocation, setSelectedLocation] = useState<string>("all");
 
   const typeOptions = [
     { id: "type-photo", label: "Фотосъёмка", value: "Фотосъёмка" },
@@ -35,7 +35,7 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
     onFilterChange({
       types: selectedTypes,
       payment: paymentType,
-      location: selectedLocation,
+      location: selectedLocation === "all" ? "" : selectedLocation,
     });
   }, [selectedTypes, paymentType, selectedLocation, onFilterChange]);
 
@@ -104,7 +104,7 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
               <SelectValue placeholder="Выберите город" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все города</SelectItem>
+              <SelectItem value="all">Все города</SelectItem>
               <SelectItem value="Москва">Москва</SelectItem>
               <SelectItem value="Санкт-Петербург">Санкт-Петербург</SelectItem>
               <SelectItem value="Казань">Казань</SelectItem>
