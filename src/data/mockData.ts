@@ -80,10 +80,13 @@ export const searchCastings = (
     payment?: string,
     location?: string
   }
-) => {
-  return castings.filter(casting => {
+): Casting[] => {
+  console.log("Поисковый запрос:", query);
+  console.log("Фильтры:", filters);
+  
+  const results = castings.filter(casting => {
     // Поиск по строке запроса
-    const matchesQuery = query === '' || 
+    const matchesQuery = !query || query === '' || 
       casting.title.toLowerCase().includes(query.toLowerCase()) ||
       casting.description.toLowerCase().includes(query.toLowerCase());
     
@@ -98,9 +101,12 @@ export const searchCastings = (
       (filters.payment === 'tfp' && casting.compensation === 'TFP');
     
     // Фильтрация по локации
-    const matchesLocation = !filters.location || 
+    const matchesLocation = !filters.location || filters.location === '' || 
       casting.location === filters.location;
     
     return matchesQuery && matchesType && matchesPayment && matchesLocation;
   });
+  
+  console.log("Результаты поиска:", results.length);
+  return results;
 };

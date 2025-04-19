@@ -18,17 +18,31 @@ const Index = () => {
 
   // Обновляем результаты при изменении поиска или фильтров
   useEffect(() => {
-    const results = searchCastings(searchQuery, {
-      types: filters.types,
-      payment: filters.payment,
-      location: filters.location,
-    });
-    setFilteredCastings(results);
+    console.log("Выполняется поиск с запросом:", searchQuery);
+    console.log("Текущие фильтры:", filters);
+    
+    try {
+      const results = searchCastings(searchQuery, {
+        types: filters.types,
+        payment: filters.payment,
+        location: filters.location,
+      });
+      console.log("Найдено результатов:", results.length);
+      setFilteredCastings(results);
+    } catch (error) {
+      console.error("Ошибка при поиске:", error);
+      setFilteredCastings([]);
+    }
   }, [searchQuery, filters]);
 
   const handleSearch = () => {
+    console.log("Форма поиска отправлена с запросом:", searchQuery);
     // Поиск уже выполняется в useEffect при изменении searchQuery
-    // Этот метод нужен для обработки отправки формы поиска
+  };
+
+  const handleFilterChange = (newFilters: typeof filters) => {
+    console.log("Применены новые фильтры:", newFilters);
+    setFilters(newFilters);
   };
 
   return (
@@ -49,7 +63,7 @@ const Index = () => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Боковая панель фильтров */}
           <aside className="md:w-64 shrink-0">
-            <FilterSidebar onFilterChange={setFilters} />
+            <FilterSidebar onFilterChange={handleFilterChange} />
           </aside>
           
           {/* Основной контент с карточками */}
@@ -64,7 +78,17 @@ const Index = () => {
             {filteredCastings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCastings.map((casting) => (
-                  <ModelCard key={casting.id} {...casting} />
+                  <ModelCard 
+                    key={casting.id} 
+                    id={casting.id}
+                    title={casting.title}
+                    image={casting.image}
+                    type={casting.type}
+                    location={casting.location}
+                    date={casting.date}
+                    compensation={casting.compensation}
+                    description={casting.description}
+                  />
                 ))}
               </div>
             ) : (

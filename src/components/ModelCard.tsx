@@ -9,6 +9,7 @@ export interface ModelCardProps {
   location: string;
   date: string;
   compensation: string;
+  description: string;
 }
 
 const ModelCard = ({
@@ -26,6 +27,10 @@ const ModelCard = ({
           src={image || "/placeholder.svg"}
           alt={title}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/placeholder.svg";
+          }}
         />
         <Badge className="absolute top-2 right-2 bg-model-primary">{type}</Badge>
       </div>

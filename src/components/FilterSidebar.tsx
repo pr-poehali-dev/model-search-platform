@@ -32,6 +32,12 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
   ];
 
   useEffect(() => {
+    console.log("Отправка фильтров:", {
+      types: selectedTypes,
+      payment: paymentType,
+      location: selectedLocation === "all" ? "" : selectedLocation,
+    });
+    
     onFilterChange({
       types: selectedTypes,
       payment: paymentType,
@@ -40,10 +46,11 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
   }, [selectedTypes, paymentType, selectedLocation, onFilterChange]);
 
   const handleTypeChange = (value: string, checked: boolean) => {
+    console.log("Изменение типа:", value, checked);
     if (checked) {
-      setSelectedTypes([...selectedTypes, value]);
+      setSelectedTypes(prev => [...prev, value]);
     } else {
-      setSelectedTypes(selectedTypes.filter((type) => type !== value));
+      setSelectedTypes(prev => prev.filter((type) => type !== value));
     }
   };
 
