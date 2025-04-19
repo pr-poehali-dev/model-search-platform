@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { useState } from "react";
 
 interface SearchBarProps {
   searchQuery: string;
@@ -9,9 +10,26 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ searchQuery, onSearchChange, onSearch }: SearchBarProps) => {
+  const [inputValue, setInputValue] = useState(searchQuery);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    onSearchChange(inputValue);
     onSearch();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    // Выполняем поиск во время ввода с небольшой задержкой
+    if (value === '') {
+      onSearchChange('');
+    }
+  };
+
+  const handleInputBlur = () => {
+    onSearchChange(inputValue);
   };
 
   return (
@@ -20,8 +38,9 @@ const SearchBar = ({ searchQuery, onSearchChange, onSearch }: SearchBarProps) =>
         <Input
           type="text"
           placeholder="Поиск кастингов и съемок..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
+          value={inputValue}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
           className="w-full pl-4 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-model-primary"
         />
       </div>

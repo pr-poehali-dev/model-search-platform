@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useState } from "react";
 
 export interface ModelCardProps {
   id: number;
@@ -19,18 +20,22 @@ const ModelCard = ({
   location,
   date,
   compensation,
+  description,
 }: ModelCardProps) => {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <div className="relative h-80 overflow-hidden">
         <img
-          src={image || "/placeholder.svg"}
+          src={imageError ? "/placeholder.svg" : image}
           alt={title}
           className="w-full h-full object-cover"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "/placeholder.svg";
-          }}
+          onError={handleImageError}
         />
         <Badge className="absolute top-2 right-2 bg-model-primary">{type}</Badge>
       </div>
@@ -47,6 +52,7 @@ const ModelCard = ({
             <span className="mr-1">💰</span> {compensation}
           </div>
         </div>
+        <p className="mt-3 text-sm text-gray-600 line-clamp-3">{description}</p>
       </CardContent>
       <CardFooter className="border-t pt-4">
         <button className="w-full py-2 bg-model-secondary text-white rounded-md hover:bg-model-dark transition-colors">

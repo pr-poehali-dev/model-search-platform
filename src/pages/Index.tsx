@@ -15,33 +15,37 @@ const Index = () => {
     location: "",
   });
   const [filteredCastings, setFilteredCastings] = useState<Casting[]>(castings);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Обновляем результаты при изменении поиска или фильтров
   useEffect(() => {
-    console.log("Выполняется поиск с запросом:", searchQuery);
-    console.log("Текущие фильтры:", filters);
+    setIsSearching(true);
     
-    try {
-      const results = searchCastings(searchQuery, {
-        types: filters.types,
-        payment: filters.payment,
-        location: filters.location,
-      });
-      console.log("Найдено результатов:", results.length);
-      setFilteredCastings(results);
-    } catch (error) {
-      console.error("Ошибка при поиске:", error);
-      setFilteredCastings([]);
-    }
+    // Добавляем небольшую задержку для лучшего UX
+    const searchTimeout = setTimeout(() => {
+      try {
+        const results = searchCastings(searchQuery, {
+          types: filters.types,
+          payment: filters.payment,
+          location: filters.location,
+        });
+        setFilteredCastings(results);
+      } catch (error) {
+        console.error("Ошибка при поиске:", error);
+        setFilteredCastings([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+    
+    return () => clearTimeout(searchTimeout);
   }, [searchQuery, filters]);
 
   const handleSearch = () => {
-    console.log("Форма поиска отправлена с запросом:", searchQuery);
     // Поиск уже выполняется в useEffect при изменении searchQuery
   };
 
   const handleFilterChange = (newFilters: typeof filters) => {
-    console.log("Применены новые фильтры:", newFilters);
     setFilters(newFilters);
   };
 
@@ -72,10 +76,17 @@ const Index = () => {
               <h2 className="text-2xl font-bold text-model-primary">
                 Актуальные кастинги
               </h2>
-              <span className="text-gray-600">Найдено: {filteredCastings.length}</span>
+              <span className="text-gray-600">
+                Найдено: {isSearching ? '...' : filteredCastings.length}
+              </span>
             </div>
             
-            {filteredCastings.length > 0 ? (
+            {isSearching ? (
+              <div className="p-8 text-center">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-model-primary border-r-transparent"></div>
+                <p className="mt-4 text-gray-600">Выполняется поиск...</p>
+              </div>
+            ) : filteredCastings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCastings.map((casting) => (
                   <ModelCard 

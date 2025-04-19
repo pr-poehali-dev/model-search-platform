@@ -81,14 +81,14 @@ export const searchCastings = (
     location?: string
   }
 ): Casting[] => {
-  console.log("Поисковый запрос:", query);
-  console.log("Фильтры:", filters);
+  // Нормализация запроса
+  const normalizedQuery = query?.toLowerCase().trim() || '';
   
-  const results = castings.filter(casting => {
+  return castings.filter(casting => {
     // Поиск по строке запроса
-    const matchesQuery = !query || query === '' || 
-      casting.title.toLowerCase().includes(query.toLowerCase()) ||
-      casting.description.toLowerCase().includes(query.toLowerCase());
+    const matchesQuery = normalizedQuery === '' || 
+      casting.title.toLowerCase().includes(normalizedQuery) ||
+      casting.description.toLowerCase().includes(normalizedQuery);
     
     // Фильтрация по типу
     const matchesType = !filters.types?.length || 
@@ -106,7 +106,4 @@ export const searchCastings = (
     
     return matchesQuery && matchesType && matchesPayment && matchesLocation;
   });
-  
-  console.log("Результаты поиска:", results.length);
-  return results;
 };

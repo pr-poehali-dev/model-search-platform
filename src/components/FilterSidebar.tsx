@@ -9,6 +9,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 interface FilterSidebarProps {
   onFilterChange: (filters: {
@@ -31,22 +32,32 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
     { id: "type-tfp", label: "TFP", value: "TFP" },
   ];
 
-  useEffect(() => {
-    console.log("Отправка фильтров:", {
-      types: selectedTypes,
-      payment: paymentType,
-      location: selectedLocation === "all" ? "" : selectedLocation,
-    });
-    
+  const applyFilters = () => {
     onFilterChange({
       types: selectedTypes,
       payment: paymentType,
       location: selectedLocation === "all" ? "" : selectedLocation,
     });
-  }, [selectedTypes, paymentType, selectedLocation, onFilterChange]);
+  };
+
+  const resetFilters = () => {
+    setSelectedTypes([]);
+    setPaymentType("all");
+    setSelectedLocation("all");
+    // Применяем сброшенные фильтры
+    onFilterChange({
+      types: [],
+      payment: "all",
+      location: "",
+    });
+  };
+
+  // Примененяем фильтры при их изменении
+  useEffect(() => {
+    applyFilters();
+  }, [selectedTypes, paymentType, selectedLocation]);
 
   const handleTypeChange = (value: string, checked: boolean) => {
-    console.log("Изменение типа:", value, checked);
     if (checked) {
       setSelectedTypes(prev => [...prev, value]);
     } else {
@@ -56,7 +67,17 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
 
   return (
     <div className="w-full md:w-64 p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-model-primary">Фильтры</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-model-primary">Фильтры</h2>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={resetFilters}
+          className="text-xs"
+        >
+          Сбросить
+        </Button>
+      </div>
       
       <div className="space-y-6">
         {/* Тип проекта */}
@@ -72,7 +93,7 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
                     handleTypeChange(option.value, checked === true)
                   }
                 />
-                <Label htmlFor={option.id}>{option.label}</Label>
+                <Label htmlFor={option.id} className="cursor-pointer">{option.label}</Label>
               </div>
             ))}
           </div>
@@ -87,15 +108,15 @@ const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="pay-all" />
-              <Label htmlFor="pay-all">Любая</Label>
+              <Label htmlFor="pay-all" className="cursor-pointer">Любая</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="paid" id="pay-paid" />
-              <Label htmlFor="pay-paid">Оплачиваемые</Label>
+              <Label htmlFor="pay-paid" className="cursor-pointer">Оплачиваемые</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="tfp" id="pay-tfp" />
-              <Label htmlFor="pay-tfp">TFP</Label>
+              <Label htmlFor="pay-tfp" className="cursor-pointer">TFP</Label>
             </div>
           </RadioGroup>
         </div>
