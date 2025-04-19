@@ -19,12 +19,6 @@ const Footer = () => {
                   t.me/vocoders
                 </a>
               </li>
-              <li className="flex items-center">
-                <span className="mr-2">📧</span>
-                <a href="mailto:contact@modelsearch.ru" className="hover:underline">
-                  contact@modelsearch.ru
-                </a>
-              </li>
             </ul>
           </div>
           
