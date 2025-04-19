@@ -8,8 +8,45 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { useState, useEffect } from "react";
 
-const FilterSidebar = () => {
+interface FilterSidebarProps {
+  onFilterChange: (filters: {
+    types: string[];
+    payment: string;
+    location: string;
+  }) => void;
+}
+
+const FilterSidebar = ({ onFilterChange }: FilterSidebarProps) => {
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [paymentType, setPaymentType] = useState<string>("all");
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+
+  const typeOptions = [
+    { id: "type-photo", label: "Фотосъёмка", value: "Фотосъёмка" },
+    { id: "type-video", label: "Видеосъёмка", value: "Видеосъёмка" },
+    { id: "type-runway", label: "Показ", value: "Показ" },
+    { id: "type-mixed", label: "Фото+Видео", value: "Фото+Видео" },
+    { id: "type-tfp", label: "TFP", value: "TFP" },
+  ];
+
+  useEffect(() => {
+    onFilterChange({
+      types: selectedTypes,
+      payment: paymentType,
+      location: selectedLocation,
+    });
+  }, [selectedTypes, paymentType, selectedLocation, onFilterChange]);
+
+  const handleTypeChange = (value: string, checked: boolean) => {
+    if (checked) {
+      setSelectedTypes([...selectedTypes, value]);
+    } else {
+      setSelectedTypes(selectedTypes.filter((type) => type !== value));
+    }
+  };
+
   return (
     <div className="w-full md:w-64 p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4 text-model-primary">Фильтры</h2>
@@ -19,29 +56,28 @@ const FilterSidebar = () => {
         <div>
           <h3 className="font-medium mb-2">Тип проекта</h3>
           <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="type-photo" />
-              <Label htmlFor="type-photo">Фотосъемка</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="type-video" />
-              <Label htmlFor="type-video">Видеосъемка</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="type-runway" />
-              <Label htmlFor="type-runway">Показ мод</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="type-acting" />
-              <Label htmlFor="type-acting">Актерское</Label>
-            </div>
+            {typeOptions.map((option) => (
+              <div key={option.id} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={option.id} 
+                  checked={selectedTypes.includes(option.value)}
+                  onCheckedChange={(checked) => 
+                    handleTypeChange(option.value, checked === true)
+                  }
+                />
+                <Label htmlFor={option.id}>{option.label}</Label>
+              </div>
+            ))}
           </div>
         </div>
         
         {/* Оплата */}
         <div>
           <h3 className="font-medium mb-2">Оплата</h3>
-          <RadioGroup defaultValue="all">
+          <RadioGroup 
+            value={paymentType} 
+            onValueChange={setPaymentType}
+          >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="pay-all" />
               <Label htmlFor="pay-all">Любая</Label>
@@ -60,16 +96,19 @@ const FilterSidebar = () => {
         {/* Локация */}
         <div>
           <h3 className="font-medium mb-2">Город</h3>
-          <Select>
+          <Select 
+            value={selectedLocation} 
+            onValueChange={setSelectedLocation}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Выберите город" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="moscow">Москва</SelectItem>
-              <SelectItem value="spb">Санкт-Петербург</SelectItem>
-              <SelectItem value="kazan">Казань</SelectItem>
-              <SelectItem value="sochi">Сочи</SelectItem>
-              <SelectItem value="other">Другие города</SelectItem>
+              <SelectItem value="">Все города</SelectItem>
+              <SelectItem value="Москва">Москва</SelectItem>
+              <SelectItem value="Санкт-Петербург">Санкт-Петербург</SelectItem>
+              <SelectItem value="Казань">Казань</SelectItem>
+              <SelectItem value="Сочи">Сочи</SelectItem>
             </SelectContent>
           </Select>
         </div>

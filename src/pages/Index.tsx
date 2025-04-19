@@ -1,63 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import FilterSidebar from "@/components/FilterSidebar";
 import ModelCard from "@/components/ModelCard";
-import FeaturedModels from "@/components/FeaturedModels";
-import { castings } from "@/data/mockData";
+import { castings, searchCastings, Casting } from "@/data/mockData";
+import SearchBar from "@/components/SearchBar";
 
 const Index = () => {
-  const [searchResults] = useState(castings);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    types: [] as string[],
+    payment: "all",
+    location: "",
+  });
+  const [filteredCastings, setFilteredCastings] = useState<Casting[]>(castings);
+
+  // Обновляем результаты при изменении поиска или фильтров
+  useEffect(() => {
+    const results = searchCastings(searchQuery, {
+      types: filters.types,
+      payment: filters.payment,
+      location: filters.location,
+    });
+    setFilteredCastings(results);
+  }, [searchQuery, filters]);
+
+  const handleSearch = () => {
+    // Поиск уже выполняется в useEffect при изменении searchQuery
+    // Этот метод нужен для обработки отправки формы поиска
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <HeroSection />
       
-      <main className="flex-grow py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Актуальные кастинги и съёмки</h2>
+      <main className="flex-grow container mx-auto px-4 py-8">
+        {/* Поисковая строка */}
+        <div className="mb-6">
+          <SearchBar 
+            searchQuery={searchQuery} 
+            onSearchChange={setSearchQuery} 
+            onSearch={handleSearch}
+          />
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Боковая панель фильтров */}
+          <aside className="md:w-64 shrink-0">
+            <FilterSidebar onFilterChange={setFilters} />
+          </aside>
           
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Сайдбар с фильтрами */}
-            <aside className="w-full md:w-64 md:flex-shrink-0">
-              <FilterSidebar />
-            </aside>
+          {/* Основной контент с карточками */}
+          <div className="flex-grow">
+            <div className="mb-4 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-model-primary">
+                Актуальные кастинги
+              </h2>
+              <span className="text-gray-600">Найдено: {filteredCastings.length}</span>
+            </div>
             
-            {/* Основной контент с карточками */}
-            <div className="flex-grow">
+            {filteredCastings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {searchResults.map((casting) => (
-                  <ModelCard 
-                    key={casting.id}
-                    id={casting.id}
-                    title={casting.title}
-                    image={casting.image}
-                    type={casting.type}
-                    location={casting.location}
-                    date={casting.date}
-                    compensation={casting.compensation}
-                  />
+                {filteredCastings.map((casting) => (
+                  <ModelCard key={casting.id} {...casting} />
                 ))}
               </div>
-              
-              {/* Пагинация */}
-              <div className="mt-8 flex justify-center">
-                <div className="flex space-x-1">
-                  <button className="px-4 py-2 bg-white border rounded-md hover:bg-gray-100">1</button>
-                  <button className="px-4 py-2 bg-white border rounded-md hover:bg-gray-100">2</button>
-                  <button className="px-4 py-2 bg-white border rounded-md hover:bg-gray-100">3</button>
-                  <span className="px-4 py-2">...</span>
-                  <button className="px-4 py-2 bg-white border rounded-md hover:bg-gray-100">10</button>
-                </div>
+            ) : (
+              <div className="p-8 text-center bg-gray-50 rounded-lg">
+                <p className="text-xl text-gray-600">
+                  По вашему запросу ничего не найдено.
+                </p>
+                <p className="mt-2 text-gray-500">
+                  Попробуйте изменить параметры поиска или фильтры.
+                </p>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </main>
       
-      <FeaturedModels />
       <Footer />
     </div>
   );

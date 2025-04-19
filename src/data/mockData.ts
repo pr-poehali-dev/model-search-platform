@@ -13,7 +13,7 @@ export const castings: Casting[] = [
   {
     id: 1,
     title: "Фотосессия купальников для летнего каталога",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1564485377539-4af72d1f6a2f?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
     type: "Фотосъёмка",
     location: "Москва",
     date: "10.06.2023",
@@ -23,7 +23,7 @@ export const castings: Casting[] = [
   {
     id: 2,
     title: "Рекламная кампания пляжной одежды",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1552673597-e3cd6747a996?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
     type: "Видеосъёмка",
     location: "Сочи",
     date: "15.06.2023",
@@ -33,7 +33,7 @@ export const castings: Casting[] = [
   {
     id: 3,
     title: "TFP фотосессия в бикини на пляже",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
     type: "TFP",
     location: "Санкт-Петербург",
     date: "20.06.2023",
@@ -43,7 +43,7 @@ export const castings: Casting[] = [
   {
     id: 4,
     title: "Показ купальников на Неделе Моды",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
     type: "Показ",
     location: "Москва",
     date: "02.07.2023",
@@ -53,7 +53,7 @@ export const castings: Casting[] = [
   {
     id: 5,
     title: "Съёмка летней коллекции для журнала",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
     type: "Фотосъёмка",
     location: "Казань",
     date: "25.06.2023",
@@ -63,7 +63,7 @@ export const castings: Casting[] = [
   {
     id: 6,
     title: "Рекламная съёмка для пляжного клуба",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1583766395091-2eb9994ed094?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
     type: "Фото+Видео",
     location: "Сочи",
     date: "05.07.2023",
@@ -71,3 +71,36 @@ export const castings: Casting[] = [
     description: "Фото и видеосъёмка для рекламной кампании элитного пляжного клуба. Съёмки будут проходить на побережье."
   }
 ];
+
+// Функция поиска кастингов
+export const searchCastings = (
+  query: string, 
+  filters: {
+    types?: string[],
+    payment?: string,
+    location?: string
+  }
+) => {
+  return castings.filter(casting => {
+    // Поиск по строке запроса
+    const matchesQuery = query === '' || 
+      casting.title.toLowerCase().includes(query.toLowerCase()) ||
+      casting.description.toLowerCase().includes(query.toLowerCase());
+    
+    // Фильтрация по типу
+    const matchesType = !filters.types?.length || 
+      filters.types.includes(casting.type);
+    
+    // Фильтрация по оплате
+    const matchesPayment = !filters.payment || 
+      filters.payment === 'all' || 
+      (filters.payment === 'paid' && casting.compensation !== 'TFP') ||
+      (filters.payment === 'tfp' && casting.compensation === 'TFP');
+    
+    // Фильтрация по локации
+    const matchesLocation = !filters.location || 
+      casting.location === filters.location;
+    
+    return matchesQuery && matchesType && matchesPayment && matchesLocation;
+  });
+};
